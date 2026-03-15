@@ -1,6 +1,28 @@
 using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddControllers();
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddOpenApi();
+
+var app = builder.Build();
+
+app.MapOpenApi();
+app.MapScalarApiReference(options =>
+{
+    options.WithOpenApiRoutePattern("/openapi/v1.json");
+});
+
+app.UseHttpsRedirection();
+app.MapControllers();
+
+app.Run();
+
+// --- Original minimal API implementation (kept for reference) ---
+/*
+using Scalar.AspNetCore;
+
+var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddOpenApi();
 
@@ -112,3 +134,4 @@ app.Run();
 record RobotCommand(int Id, string Name, string Description, bool MovesRobot);
 
 record RobotMap(int Size);
+*/
