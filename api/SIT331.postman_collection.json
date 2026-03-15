@@ -6,181 +6,255 @@
   },
   "item": [
     {
-      "name": "test",
-      "request": {
-        "method": "GET",
-        "header": [],
-        "url": {
-          "raw": "http://{{api-host}}:{{port}}/",
-          "protocol": "http",
-          "host": ["{{api-host}}"],
-          "port": "{{port}}",
-          "path": [""]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "robot-commands",
-      "request": {
-        "method": "GET",
-        "header": [],
-        "url": {
-          "raw": "http://{{api-host}}:{{port}}/robot-commands",
-          "protocol": "http",
-          "host": ["{{api-host}}"],
-          "port": "{{port}}",
-          "path": ["robot-commands"]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "move-commands",
-      "request": {
-        "method": "GET",
-        "header": [],
-        "url": {
-          "raw": "http://{{api-host}}:{{port}}/robot-commands/move",
-          "protocol": "http",
-          "host": ["{{api-host}}"],
-          "port": "{{port}}",
-          "path": ["robot-commands", "move"]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "read-command",
-      "request": {
-        "method": "GET",
-        "header": [],
-        "url": {
-          "raw": "http://{{api-host}}:{{port}}/robot-commands/1",
-          "protocol": "http",
-          "host": ["{{api-host}}"],
-          "port": "{{port}}",
-          "path": ["robot-commands", "1"]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "create-robot-command",
-      "request": {
-        "method": "POST",
-        "header": [
-          {
-            "key": "Content-Type",
-            "value": "application/json"
-          }
-        ],
-        "body": {
-          "mode": "raw",
-          "raw": "{\n\t\"id\": 0,\n\t\"name\": \"REPORT\",\n\t\"description\": \"Report current position\",\n\t\"movesRobot\": false\n}"
+      "name": "Robot Commands",
+      "item": [
+        {
+          "name": "get-all-robot-commands",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://{{api-host}}:{{port}}/api/robot-commands",
+              "protocol": "http",
+              "host": ["{{api-host}}"],
+              "port": "{{port}}",
+              "path": ["api", "robot-commands"]
+            }
+          },
+          "response": []
         },
-        "url": {
-          "raw": "http://{{api-host}}:{{port}}/robot-commands",
-          "protocol": "http",
-          "host": ["{{api-host}}"],
-          "port": "{{port}}",
-          "path": ["robot-commands"]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "update-robot-command",
-      "request": {
-        "method": "PUT",
-        "header": [
-          {
-            "key": "Content-Type",
-            "value": "application/json"
-          }
-        ],
-        "body": {
-          "mode": "raw",
-          "raw": "{\n\t\"id\": 1,\n\t\"name\": \"LEFT\",\n\t\"description\": \"Updated: rotate left 90 degrees\",\n\t\"movesRobot\": false\n}"
+        {
+          "name": "get-move-commands",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://{{api-host}}:{{port}}/api/robot-commands/move",
+              "protocol": "http",
+              "host": ["{{api-host}}"],
+              "port": "{{port}}",
+              "path": ["api", "robot-commands", "move"]
+            }
+          },
+          "response": []
         },
-        "url": {
-          "raw": "http://{{api-host}}:{{port}}/robot-commands/1",
-          "protocol": "http",
-          "host": ["{{api-host}}"],
-          "port": "{{port}}",
-          "path": ["robot-commands", "1"]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "read-robot-map",
-      "request": {
-        "method": "GET",
-        "header": [],
-        "url": {
-          "raw": "http://{{api-host}}:{{port}}/robot-map",
-          "protocol": "http",
-          "host": ["{{api-host}}"],
-          "port": "{{port}}",
-          "path": ["robot-map"]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "read-coordinate",
-      "request": {
-        "method": "GET",
-        "header": [],
-        "url": {
-          "raw": "http://{{api-host}}:{{port}}/robot-map/3-4",
-          "protocol": "http",
-          "host": ["{{api-host}}"],
-          "port": "{{port}}",
-          "path": ["robot-map", "3-4"]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "update-map-size",
-      "request": {
-        "method": "PUT",
-        "header": [
-          {
-            "key": "Content-Type",
-            "value": "application/json"
-          }
-        ],
-        "body": {
-          "mode": "raw",
-          "raw": "{\n\t\"size\": 10\n}"
+        {
+          "name": "get-robot-command-by-id",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://{{api-host}}:{{port}}/api/robot-commands/1",
+              "protocol": "http",
+              "host": ["{{api-host}}"],
+              "port": "{{port}}",
+              "path": ["api", "robot-commands", "1"]
+            }
+          },
+          "response": []
         },
-        "url": {
-          "raw": "http://{{api-host}}:{{port}}/robot-map",
-          "protocol": "http",
-          "host": ["{{api-host}}"],
-          "port": "{{port}}",
-          "path": ["robot-map"]
+        {
+          "name": "create-robot-command",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n\t\"name\": \"BLINK\",\n\t\"isMoveCommand\": false\n}"
+            },
+            "url": {
+              "raw": "http://{{api-host}}:{{port}}/api/robot-commands",
+              "protocol": "http",
+              "host": ["{{api-host}}"],
+              "port": "{{port}}",
+              "path": ["api", "robot-commands"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "update-robot-command",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n\t\"name\": \"LEFT\",\n\t\"description\": \"Updated: rotate left 90 degrees\",\n\t\"isMoveCommand\": true\n}"
+            },
+            "url": {
+              "raw": "http://{{api-host}}:{{port}}/api/robot-commands/1",
+              "protocol": "http",
+              "host": ["{{api-host}}"],
+              "port": "{{port}}",
+              "path": ["api", "robot-commands", "1"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "delete-robot-command",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "http://{{api-host}}:{{port}}/api/robot-commands/5",
+              "protocol": "http",
+              "host": ["{{api-host}}"],
+              "port": "{{port}}",
+              "path": ["api", "robot-commands", "5"]
+            }
+          },
+          "response": []
         }
-      },
-      "response": []
+      ]
     },
     {
-      "name": "this-one-should-fail",
-      "request": {
-        "method": "GET",
-        "header": [],
-        "url": {
-          "raw": "http://{{api-host}}:{{port}}/intentional-error",
-          "protocol": "http",
-          "host": ["{{api-host}}"],
-          "port": "{{port}}",
-          "path": ["intentional-error"]
+      "name": "Maps",
+      "item": [
+        {
+          "name": "get-all-maps",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://{{api-host}}:{{port}}/api/maps",
+              "protocol": "http",
+              "host": ["{{api-host}}"],
+              "port": "{{port}}",
+              "path": ["api", "maps"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "get-square-maps",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://{{api-host}}:{{port}}/api/maps/square",
+              "protocol": "http",
+              "host": ["{{api-host}}"],
+              "port": "{{port}}",
+              "path": ["api", "maps", "square"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "get-map-by-id",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://{{api-host}}:{{port}}/api/maps/1",
+              "protocol": "http",
+              "host": ["{{api-host}}"],
+              "port": "{{port}}",
+              "path": ["api", "maps", "1"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "create-map",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n\t\"columns\": 8,\n\t\"rows\": 8,\n\t\"name\": \"MARS\",\n\t\"description\": \"Mars exploration grid\"\n}"
+            },
+            "url": {
+              "raw": "http://{{api-host}}:{{port}}/api/maps",
+              "protocol": "http",
+              "host": ["{{api-host}}"],
+              "port": "{{port}}",
+              "path": ["api", "maps"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "update-map",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n\t\"columns\": 20,\n\t\"rows\": 20,\n\t\"name\": \"DEAKIN\",\n\t\"description\": \"Updated: larger Deakin map\"\n}"
+            },
+            "url": {
+              "raw": "http://{{api-host}}:{{port}}/api/maps/1",
+              "protocol": "http",
+              "host": ["{{api-host}}"],
+              "port": "{{port}}",
+              "path": ["api", "maps", "1"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "delete-map",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "http://{{api-host}}:{{port}}/api/maps/3",
+              "protocol": "http",
+              "host": ["{{api-host}}"],
+              "port": "{{port}}",
+              "path": ["api", "maps", "3"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "check-coordinate",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://{{api-host}}:{{port}}/api/maps/1/3-4",
+              "protocol": "http",
+              "host": ["{{api-host}}"],
+              "port": "{{port}}",
+              "path": ["api", "maps", "1", "3-4"]
+            }
+          },
+          "response": []
         }
-      },
-      "response": []
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "api-host",
+      "value": "localhost"
+    },
+    {
+      "key": "port",
+      "value": "5172"
     }
   ]
 }
