@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using robot_api.Models;
+using robot_api.Persistence;
 
 namespace robot_api.Controllers;
 
@@ -7,39 +8,22 @@ namespace robot_api.Controllers;
 [Route("api/robot-commands")]
 public class RobotCommandsController : ControllerBase
 {
-    private static readonly List<RobotCommand> _commands =
-    [
-        new(1, "LEFT", true, DateTime.Now, DateTime.Now, "Turn the robot 90 degrees left"),
-        new(2, "RIGHT", true, DateTime.Now, DateTime.Now, "Turn the robot 90 degrees right"),
-        new(3, "MOVE", true, DateTime.Now, DateTime.Now, "Move the robot one step forward"),
-        new(
-            4,
-            "PLACE",
-            false,
-            DateTime.Now,
-            DateTime.Now,
-            "Place the robot at X,Y facing direction D"
-        ),
-        new(
-            5,
-            "REPORT",
-            false,
-            DateTime.Now,
-            DateTime.Now,
-            "Report the current position of the robot"
-        ),
-    ];
-
     [HttpGet()]
-    public IEnumerable<RobotCommand> GetAllRobotCommands() => _commands;
+    public IEnumerable<RobotCommand> GetAllRobotCommands()
+    {
+        return RobotCommandDataAccess.GetRobotCommands();
+    }
 
     [HttpGet("move")]
-    public IEnumerable<RobotCommand> GetMoveCommandsOnly() => _commands.Where(c => c.IsMoveCommand);
+    public IEnumerable<RobotCommand> GetMoveCommandsOnly()
+    {
+        return RobotCommandDataAccess.GetMoveCommands();
+    }
 
     [HttpGet("{id}", Name = "GetRobotCommand")]
     public IActionResult GetRobotCommandById(int id)
     {
-        var command = _commands.FirstOrDefault(c => c.Id == id);
+        var command = RobotCommandDataAccess.GetRobotCommandById(id);
         if (command == null)
             return NotFound();
 
@@ -52,20 +36,7 @@ public class RobotCommandsController : ControllerBase
         if (newCommand == null)
             return BadRequest();
 
-        if (_commands.Any(c => c.Name == newCommand.Name))
-            return Conflict();
-
-        var id = _commands.Max(c => c.Id) + 1;
-        var command = new RobotCommand(
-            id,
-            newCommand.Name,
-            newCommand.IsMoveCommand,
-            DateTime.Now,
-            DateTime.Now,
-            newCommand.Description
-        );
-
-        _commands.Add(command);
+        var command = RobotCommandDataAccess.InsertRobotCommand(newCommand);
 
         return CreatedAtRoute("GetRobotCommand", new { id = command.Id }, command);
     }
@@ -73,17 +44,14 @@ public class RobotCommandsController : ControllerBase
     [HttpPut("{id}")]
     public IActionResult UpdateRobotCommand(int id, RobotCommand updatedCommand)
     {
-        var command = _commands.FirstOrDefault(c => c.Id == id);
+        var command = RobotCommandDataAccess.GetRobotCommandById(id);
         if (command == null)
             return NotFound();
 
         if (updatedCommand == null)
             return BadRequest();
 
-        command.Name = updatedCommand.Name;
-        command.Description = updatedCommand.Description;
-        command.IsMoveCommand = updatedCommand.IsMoveCommand;
-        command.ModifiedDate = DateTime.Now;
+        RobotCommandDataAccess.UpdateRobotCommand(id, updatedCommand);
 
         return NoContent();
     }
@@ -91,11 +59,9 @@ public class RobotCommandsController : ControllerBase
     [HttpDelete("{id}")]
     public IActionResult DeleteRobotCommand(int id)
     {
-        var command = _commands.FirstOrDefault(c => c.Id == id);
-        if (command == null)
+        var deleted = RobotCommandDataAccess.DeleteRobotCommand(id);
+        if (!deleted)
             return NotFound();
-
-        _commands.Remove(command);
 
         return NoContent();
     }

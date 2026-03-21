@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using robot_api.Models;
+using robot_api.Persistence;
 
 namespace robot_api.Controllers;
 
@@ -7,23 +8,22 @@ namespace robot_api.Controllers;
 [Route("api/maps")]
 public class MapsController : ControllerBase
 {
-    private static readonly List<Map> _maps =
-    [
-        new(1, 5, 5, "DEAKIN", DateTime.Now, DateTime.Now, "Default 5x5 square map"),
-        new(2, 10, 10, "MOON", DateTime.Now, DateTime.Now, "Large 10x10 square map"),
-        new(3, 5, 10, "BURWOOD", DateTime.Now, DateTime.Now, "Rectangular 5x10 map"),
-    ];
-
     [HttpGet()]
-    public IEnumerable<Map> GetAllMaps() => _maps;
+    public IEnumerable<Map> GetAllMaps()
+    {
+        return MapDataAccess.GetMaps();
+    }
 
     [HttpGet("square")]
-    public IEnumerable<Map> GetSquareMapsOnly() => _maps.Where(m => m.Columns == m.Rows);
+    public IEnumerable<Map> GetSquareMapsOnly()
+    {
+        return MapDataAccess.GetSquareMaps();
+    }
 
     [HttpGet("{id}", Name = "GetMap")]
     public IActionResult GetMapById(int id)
     {
-        var map = _maps.FirstOrDefault(m => m.Id == id);
+        var map = MapDataAccess.GetMapById(id);
         if (map == null)
             return NotFound();
 
@@ -36,21 +36,7 @@ public class MapsController : ControllerBase
         if (newMap == null)
             return BadRequest();
 
-        if (_maps.Any(m => m.Name == newMap.Name))
-            return Conflict();
-
-        var id = _maps.Max(m => m.Id) + 1;
-        var map = new Map(
-            id,
-            newMap.Columns,
-            newMap.Rows,
-            newMap.Name,
-            DateTime.Now,
-            DateTime.Now,
-            newMap.Description
-        );
-
-        _maps.Add(map);
+        var map = MapDataAccess.InsertMap(newMap);
 
         return CreatedAtRoute("GetMap", new { id = map.Id }, map);
     }
@@ -58,18 +44,14 @@ public class MapsController : ControllerBase
     [HttpPut("{id}")]
     public IActionResult UpdateMap(int id, Map updatedMap)
     {
-        var map = _maps.FirstOrDefault(m => m.Id == id);
+        var map = MapDataAccess.GetMapById(id);
         if (map == null)
             return NotFound();
 
         if (updatedMap == null)
             return BadRequest();
 
-        map.Columns = updatedMap.Columns;
-        map.Rows = updatedMap.Rows;
-        map.Name = updatedMap.Name;
-        map.Description = updatedMap.Description;
-        map.ModifiedDate = DateTime.Now;
+        MapDataAccess.UpdateMap(id, updatedMap);
 
         return NoContent();
     }
@@ -77,11 +59,9 @@ public class MapsController : ControllerBase
     [HttpDelete("{id}")]
     public IActionResult DeleteMap(int id)
     {
-        var map = _maps.FirstOrDefault(m => m.Id == id);
-        if (map == null)
+        var deleted = MapDataAccess.DeleteMap(id);
+        if (!deleted)
             return NotFound();
-
-        _maps.Remove(map);
 
         return NoContent();
     }
@@ -92,7 +72,7 @@ public class MapsController : ControllerBase
         if (x < 0 || y < 0)
             return BadRequest();
 
-        var map = _maps.FirstOrDefault(m => m.Id == id);
+        var map = MapDataAccess.GetMapById(id);
         if (map == null)
             return NotFound();
 
