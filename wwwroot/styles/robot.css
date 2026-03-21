@@ -1,0 +1,29 @@
+.swagger-ui img {
+    content: url("/images/deakin-logo.png");
+}
+
+.swagger-ui .topbar-wrapper .link svg {
+    display: none;
+}
+
+.swagger-ui .topbar-wrapper .link {
+    display: flex;
+    align-items: center;
+}
+
+.swagger-ui .topbar-wrapper .link::after {
+    content: "";
+    background: url("/images/deakin-logo.png") no-repeat center;
+    background-size: contain;
+    width: 150px;
+    height: 40px;
+    display: inline-block;
+}
+
+.swagger-ui .topbar .download-url-wrapper .select-label select {
+    border-color: #007d98;
+}
+
+.swagger-ui .info .title small:last-child {
+    background-color: #007d98 !important;
+}

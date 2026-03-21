@@ -4,22 +4,46 @@ using robot_api.Persistence;
 
 namespace robot_api.Controllers;
 
+/// <summary>
+/// Controller for managing robot commands.
+/// </summary>
 [ApiController]
 [Route("api/robot-commands")]
 public class RobotCommandsController : ControllerBase
 {
+    /// <summary>
+    /// Retrieves all robot commands.
+    /// </summary>
+    /// <returns>A list of all robot commands.</returns>
+    /// <response code="200">Returns all robot commands.</response>
+    [ProducesResponseType(StatusCodes.Status200OK)]
     [HttpGet()]
     public IEnumerable<RobotCommand> GetAllRobotCommands()
     {
         return RobotCommandDataAccess.GetRobotCommands();
     }
 
+    /// <summary>
+    /// Retrieves only move commands.
+    /// </summary>
+    /// <returns>A list of move commands.</returns>
+    /// <response code="200">Returns all move commands.</response>
+    [ProducesResponseType(StatusCodes.Status200OK)]
     [HttpGet("move")]
     public IEnumerable<RobotCommand> GetMoveCommandsOnly()
     {
         return RobotCommandDataAccess.GetMoveCommands();
     }
 
+    /// <summary>
+    /// Retrieves a specific robot command by its ID.
+    /// </summary>
+    /// <param name="id">The ID of the robot command to retrieve.</param>
+    /// <returns>The robot command with the specified ID.</returns>
+    /// <response code="200">Returns the robot command with the specified ID.</response>
+    /// <response code="404">If no robot command with the given ID exists.</response>
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     [HttpGet("{id}", Name = "GetRobotCommand")]
     public IActionResult GetRobotCommandById(int id)
     {
@@ -30,6 +54,28 @@ public class RobotCommandsController : ControllerBase
         return Ok(command);
     }
 
+    /// <summary>
+    /// Creates a robot command.
+    /// </summary>
+    /// <param name="newCommand">A new robot command from the HTTP request.</param>
+    /// <returns>A newly created robot command.</returns>
+    /// <remarks>
+    /// Sample request:
+    ///
+    ///     POST /api/robot-commands
+    ///     {
+    ///         "name": "DANCE",
+    ///         "isMoveCommand": true,
+    ///         "description": "Salsa on the Moon"
+    ///     }
+    ///
+    /// </remarks>
+    /// <response code="201">Returns the newly created robot command.</response>
+    /// <response code="400">If the robot command is null.</response>
+    /// <response code="409">If a robot command with the same name already exists.</response>
+    [ProducesResponseType(StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
     [HttpPost()]
     public IActionResult AddRobotCommand(RobotCommand newCommand)
     {
@@ -41,6 +87,18 @@ public class RobotCommandsController : ControllerBase
         return CreatedAtRoute("GetRobotCommand", new { id = command.Id }, command);
     }
 
+    /// <summary>
+    /// Updates an existing robot command.
+    /// </summary>
+    /// <param name="id">The ID of the robot command to update.</param>
+    /// <param name="updatedCommand">The updated robot command data from the HTTP request.</param>
+    /// <returns>No content.</returns>
+    /// <response code="204">If the robot command was successfully updated.</response>
+    /// <response code="400">If the updated robot command data is null.</response>
+    /// <response code="404">If no robot command with the given ID exists.</response>
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     [HttpPut("{id}")]
     public IActionResult UpdateRobotCommand(int id, RobotCommand updatedCommand)
     {
@@ -56,6 +114,15 @@ public class RobotCommandsController : ControllerBase
         return NoContent();
     }
 
+    /// <summary>
+    /// Deletes a robot command by its ID.
+    /// </summary>
+    /// <param name="id">The ID of the robot command to delete.</param>
+    /// <returns>No content.</returns>
+    /// <response code="204">If the robot command was successfully deleted.</response>
+    /// <response code="404">If no robot command with the given ID exists.</response>
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     [HttpDelete("{id}")]
     public IActionResult DeleteRobotCommand(int id)
     {
