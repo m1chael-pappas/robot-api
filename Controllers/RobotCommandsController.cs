@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using robot_api.Models;
 using robot_api.Persistence;
@@ -17,7 +18,7 @@ public class RobotCommandsController : ControllerBase
     /// <returns>A list of all robot commands.</returns>
     /// <response code="200">Returns all robot commands.</response>
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [HttpGet()]
+    [HttpGet, Authorize(Policy = "UserOnly")]
     public IEnumerable<RobotCommand> GetAllRobotCommands()
     {
         return RobotCommandDataAccess.GetRobotCommands();
@@ -29,7 +30,7 @@ public class RobotCommandsController : ControllerBase
     /// <returns>A list of move commands.</returns>
     /// <response code="200">Returns all move commands.</response>
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [HttpGet("move")]
+    [HttpGet("move"), Authorize(Policy = "UserOnly")]
     public IEnumerable<RobotCommand> GetMoveCommandsOnly()
     {
         return RobotCommandDataAccess.GetMoveCommands();
@@ -44,7 +45,7 @@ public class RobotCommandsController : ControllerBase
     /// <response code="404">If no robot command with the given ID exists.</response>
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [HttpGet("{id}", Name = "GetRobotCommand")]
+    [HttpGet("{id}", Name = "GetRobotCommand"), Authorize(Policy = "UserOnly")]
     public IActionResult GetRobotCommandById(int id)
     {
         var command = RobotCommandDataAccess.GetRobotCommandById(id);
@@ -76,7 +77,7 @@ public class RobotCommandsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status409Conflict)]
-    [HttpPost()]
+    [HttpPost, Authorize(Policy = "AdminOnly")]
     public IActionResult AddRobotCommand(RobotCommand newCommand)
     {
         if (newCommand == null)
@@ -99,7 +100,7 @@ public class RobotCommandsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [HttpPut("{id}")]
+    [HttpPut("{id}"), Authorize(Policy = "AdminOnly")]
     public IActionResult UpdateRobotCommand(int id, RobotCommand updatedCommand)
     {
         var command = RobotCommandDataAccess.GetRobotCommandById(id);
@@ -123,7 +124,7 @@ public class RobotCommandsController : ControllerBase
     /// <response code="404">If no robot command with the given ID exists.</response>
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [HttpDelete("{id}")]
+    [HttpDelete("{id}"), Authorize(Policy = "AdminOnly")]
     public IActionResult DeleteRobotCommand(int id)
     {
         var deleted = RobotCommandDataAccess.DeleteRobotCommand(id);

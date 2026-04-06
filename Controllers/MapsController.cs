@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using robot_api.Models;
 using robot_api.Persistence;
@@ -17,7 +18,7 @@ public class MapsController : ControllerBase
     /// <returns>A list of all maps.</returns>
     /// <response code="200">Returns all maps.</response>
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [HttpGet()]
+    [HttpGet, Authorize(Policy = "UserOnly")]
     public IEnumerable<Map> GetAllMaps()
     {
         return MapDataAccess.GetMaps();
@@ -29,7 +30,7 @@ public class MapsController : ControllerBase
     /// <returns>A list of square maps.</returns>
     /// <response code="200">Returns all square maps.</response>
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [HttpGet("square")]
+    [HttpGet("square"), Authorize(Policy = "UserOnly")]
     public IEnumerable<Map> GetSquareMapsOnly()
     {
         return MapDataAccess.GetSquareMaps();
@@ -44,7 +45,7 @@ public class MapsController : ControllerBase
     /// <response code="404">If no map with the given ID exists.</response>
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [HttpGet("{id}", Name = "GetMap")]
+    [HttpGet("{id}", Name = "GetMap"), Authorize(Policy = "UserOnly")]
     public IActionResult GetMapById(int id)
     {
         var map = MapDataAccess.GetMapById(id);
@@ -75,7 +76,7 @@ public class MapsController : ControllerBase
     /// <response code="400">If the map is null.</response>
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [HttpPost()]
+    [HttpPost, Authorize(Policy = "AdminOnly")]
     public IActionResult AddMap(Map newMap)
     {
         if (newMap == null)
@@ -98,7 +99,7 @@ public class MapsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [HttpPut("{id}")]
+    [HttpPut("{id}"), Authorize(Policy = "AdminOnly")]
     public IActionResult UpdateMap(int id, Map updatedMap)
     {
         var map = MapDataAccess.GetMapById(id);
@@ -122,7 +123,7 @@ public class MapsController : ControllerBase
     /// <response code="404">If no map with the given ID exists.</response>
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [HttpDelete("{id}")]
+    [HttpDelete("{id}"), Authorize(Policy = "AdminOnly")]
     public IActionResult DeleteMap(int id)
     {
         var deleted = MapDataAccess.DeleteMap(id);
@@ -145,7 +146,7 @@ public class MapsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [HttpGet("{id}/{x}-{y}")]
+    [HttpGet("{id}/{x}-{y}"), Authorize(Policy = "UserOnly")]
     public IActionResult CheckCoordinate(int id, int x, int y)
     {
         if (x < 0 || y < 0)
