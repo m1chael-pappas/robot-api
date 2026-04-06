@@ -32,6 +32,10 @@ TestResults/
 *.coverage
 *.coveragexml
 
+# Generated test output (Newman/Postman run results & reports)
+tests/*-results.json
+tests/newman-report*.html
+
 # Others
 *.log
 *.vs/
