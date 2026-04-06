@@ -1,0 +1,25 @@
+{
+  "id": "env-robot-api",
+  "name": "Robot Controller API",
+  "values": [
+    { "key": "host", "value": "localhost", "enabled": true },
+    { "key": "port", "value": "5172", "enabled": true },
+    { "key": "base_url", "value": "http://localhost:5172", "enabled": true },
+    { "key": "admin_email", "value": "admin@deakin.edu.au", "enabled": true },
+    { "key": "admin_password", "value": "admin123", "enabled": true },
+    { "key": "user_email", "value": "user@deakin.edu.au", "enabled": true },
+    { "key": "user_password", "value": "user123", "enabled": true },
+    { "key": "new-command-name", "value": "DANCE", "enabled": true },
+    { "key": "new-command-description", "value": "Dance on the Moon", "enabled": true },
+    { "key": "new-command-ismovecommand", "value": "false", "enabled": true },
+    { "key": "new-map-name", "value": "TESTMAP", "enabled": true },
+    { "key": "new-map-columns", "value": "8", "enabled": true },
+    { "key": "new-map-rows", "value": "6", "enabled": true },
+    { "key": "new-map-description", "value": "Test map for automated testing", "enabled": true },
+    { "key": "new-user-email", "value": "testuser@deakin.edu.au", "enabled": true },
+    { "key": "new-user-password", "value": "testpass123", "enabled": true },
+    { "key": "new-user-firstname", "value": "Test", "enabled": true },
+    { "key": "new-user-lastname", "value": "User", "enabled": true }
+  ],
+  "_postman_variable_scope": "environment"
+}

@@ -1,0 +1,1386 @@
+{
+  "info": {
+    "name": "Robot Controller API - 7.1P Automated Tests",
+    "description": "Automated end-to-end tests for the Robot Controller API with Basic Authentication and Authorization",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "basic",
+    "basic": [
+      { "key": "username", "value": "{{admin_email}}", "type": "string" },
+      { "key": "password", "value": "{{admin_password}}", "type": "string" }
+    ]
+  },
+  "item": [
+    {
+      "name": "1. Authentication Tests",
+      "item": [
+        {
+          "name": "1.1 Invalid Auth Format - Expect 401",
+          "request": {
+            "auth": {
+              "type": "basic",
+              "basic": [
+                { "key": "username", "value": "", "type": "string" },
+                { "key": "password", "value": "", "type": "string" }
+              ]
+            },
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/api/robot-commands", "host": ["{{base_url}}"], "path": ["api", "robot-commands"] }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 401 Unauthorized with empty credentials', function () {",
+                  "    pm.response.to.have.status(401);",
+                  "});",
+                  "",
+                  "pm.test('Response contains WWW-Authenticate header', function () {",
+                  "    pm.response.to.have.header('WWW-Authenticate');",
+                  "});",
+                  "",
+                  "pm.test('WWW-Authenticate header specifies Basic scheme', function () {",
+                  "    var wwwAuth = pm.response.headers.get('WWW-Authenticate');",
+                  "    pm.expect(wwwAuth).to.include('Basic');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "1.2 Wrong Password - Expect 401",
+          "request": {
+            "auth": {
+              "type": "basic",
+              "basic": [
+                { "key": "username", "value": "{{admin_email}}", "type": "string" },
+                { "key": "password", "value": "wrongpassword", "type": "string" }
+              ]
+            },
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/api/robot-commands", "host": ["{{base_url}}"], "path": ["api", "robot-commands"] }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 401 Unauthorized with wrong password', function () {",
+                  "    pm.response.to.have.status(401);",
+                  "});",
+                  "",
+                  "pm.test('Response contains WWW-Authenticate header', function () {",
+                  "    pm.response.to.have.header('WWW-Authenticate');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "1.3 Non-existent User - Expect 401",
+          "request": {
+            "auth": {
+              "type": "basic",
+              "basic": [
+                { "key": "username", "value": "nobody@deakin.edu.au", "type": "string" },
+                { "key": "password", "value": "password", "type": "string" }
+              ]
+            },
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/api/robot-commands", "host": ["{{base_url}}"], "path": ["api", "robot-commands"] }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 401 for non-existent user', function () {",
+                  "    pm.response.to.have.status(401);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "1.4 Admin Auth - Expect 200",
+          "request": {
+            "auth": {
+              "type": "basic",
+              "basic": [
+                { "key": "username", "value": "{{admin_email}}", "type": "string" },
+                { "key": "password", "value": "{{admin_password}}", "type": "string" }
+              ]
+            },
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/api/robot-commands", "host": ["{{base_url}}"], "path": ["api", "robot-commands"] }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200 OK with valid admin credentials', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response body is not empty', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.not.eql(undefined);",
+                  "    pm.response.to.not.be.null;",
+                  "    pm.response.to.not.be.undefined;",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "1.5 User Auth - Expect 200",
+          "request": {
+            "auth": {
+              "type": "basic",
+              "basic": [
+                { "key": "username", "value": "{{user_email}}", "type": "string" },
+                { "key": "password", "value": "{{user_password}}", "type": "string" }
+              ]
+            },
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/api/robot-commands", "host": ["{{base_url}}"], "path": ["api", "robot-commands"] }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200 OK with valid user credentials', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response body is not empty', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.not.eql(undefined);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "2. Authorization Tests",
+      "item": [
+        {
+          "name": "2.1 User on AdminOnly GET - Expect 403",
+          "request": {
+            "auth": {
+              "type": "basic",
+              "basic": [
+                { "key": "username", "value": "{{user_email}}", "type": "string" },
+                { "key": "password", "value": "{{user_password}}", "type": "string" }
+              ]
+            },
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/api/users/admin", "host": ["{{base_url}}"], "path": ["api", "users", "admin"] }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 403 Forbidden for User on AdminOnly endpoint', function () {",
+                  "    pm.response.to.have.status(403);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "2.2 User POST Robot Command - Expect 403",
+          "request": {
+            "auth": {
+              "type": "basic",
+              "basic": [
+                { "key": "username", "value": "{{user_email}}", "type": "string" },
+                { "key": "password", "value": "{{user_password}}", "type": "string" }
+              ]
+            },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\"name\": \"BLOCKED\", \"isMoveCommand\": false, \"description\": \"Should not be created\"}" },
+            "url": { "raw": "{{base_url}}/api/robot-commands", "host": ["{{base_url}}"], "path": ["api", "robot-commands"] }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 403 Forbidden - User cannot create commands', function () {",
+                  "    pm.response.to.have.status(403);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "2.3 User DELETE Map - Expect 403",
+          "request": {
+            "auth": {
+              "type": "basic",
+              "basic": [
+                { "key": "username", "value": "{{user_email}}", "type": "string" },
+                { "key": "password", "value": "{{user_password}}", "type": "string" }
+              ]
+            },
+            "method": "DELETE",
+            "url": { "raw": "{{base_url}}/api/maps/1", "host": ["{{base_url}}"], "path": ["api", "maps", "1"] }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 403 Forbidden - User cannot delete maps', function () {",
+                  "    pm.response.to.have.status(403);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "2.4 User DELETE User - Expect 403",
+          "request": {
+            "auth": {
+              "type": "basic",
+              "basic": [
+                { "key": "username", "value": "{{user_email}}", "type": "string" },
+                { "key": "password", "value": "{{user_password}}", "type": "string" }
+              ]
+            },
+            "method": "DELETE",
+            "url": { "raw": "{{base_url}}/api/users/1", "host": ["{{base_url}}"], "path": ["api", "users", "1"] }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 403 Forbidden - User cannot delete users', function () {",
+                  "    pm.response.to.have.status(403);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "3. Robot Commands",
+      "item": [
+        {
+          "name": "3.1 GET All Robot Commands",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/api/robot-commands", "host": ["{{base_url}}"], "path": ["api", "robot-commands"] }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200 OK', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response body is not empty', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.not.eql(undefined);",
+                  "    pm.response.to.not.be.null;",
+                  "    pm.response.to.not.be.undefined;",
+                  "});",
+                  "",
+                  "pm.test('Response body contains an array of robot commands', function () {",
+                  "    pm.expect(pm.response.json()).to.be.an('array');",
+                  "});",
+                  "",
+                  "pm.test('Array has at least one robot command', function () {",
+                  "    pm.expect(pm.response.json().length).to.be.greaterThan(0);",
+                  "});",
+                  "",
+                  "pm.test('Each command contains valid properties', function () {",
+                  "    var robotCommands = pm.response.json();",
+                  "    for (const command of robotCommands) {",
+                  "        pm.expect(command).to.have.property('id');",
+                  "        pm.expect(command).to.have.property('name');",
+                  "        pm.expect(command).to.have.property('isMoveCommand');",
+                  "        pm.expect(command).to.have.property('createdDate');",
+                  "        pm.expect(command).to.have.property('modifiedDate');",
+                  "    }",
+                  "});",
+                  "",
+                  "pm.test('Property types are correct', function () {",
+                  "    var command = pm.response.json()[0];",
+                  "    pm.expect(command.id).to.be.a('number');",
+                  "    pm.expect(command.name).to.be.a('string');",
+                  "    pm.expect(command.isMoveCommand).to.be.a('boolean');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "3.2 GET Move Commands Only",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/api/robot-commands/move", "host": ["{{base_url}}"], "path": ["api", "robot-commands", "move"] }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200 OK', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response body is not empty', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.not.eql(undefined);",
+                  "});",
+                  "",
+                  "pm.test('Response body contains an array', function () {",
+                  "    pm.expect(pm.response.json()).to.be.an('array');",
+                  "});",
+                  "",
+                  "pm.test('All returned commands are move commands', function () {",
+                  "    var commands = pm.response.json();",
+                  "    for (const command of commands) {",
+                  "        pm.expect(command.isMoveCommand).to.be.true;",
+                  "    }",
+                  "});",
+                  "",
+                  "pm.test('Move commands count is correct (3 from seed data)', function () {",
+                  "    pm.expect(pm.response.json().length).to.eql(3);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "3.3 GET Robot Command by ID",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/api/robot-commands/1", "host": ["{{base_url}}"], "path": ["api", "robot-commands", "1"] }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200 OK', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response body is not empty', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.not.eql(undefined);",
+                  "});",
+                  "",
+                  "pm.test('Response is a single object, not an array', function () {",
+                  "    pm.expect(pm.response.json()).to.be.an('object');",
+                  "    pm.expect(pm.response.json()).to.not.be.an('array');",
+                  "});",
+                  "",
+                  "pm.test('Command has correct ID', function () {",
+                  "    pm.expect(pm.response.json().id).to.eql(1);",
+                  "});",
+                  "",
+                  "pm.test('Command has expected properties and types', function () {",
+                  "    var command = pm.response.json();",
+                  "    pm.expect(command.id).to.be.a('number');",
+                  "    pm.expect(command.name).to.be.a('string');",
+                  "    pm.expect(command.isMoveCommand).to.be.a('boolean');",
+                  "    pm.expect(command.createdDate).to.be.a('string');",
+                  "    pm.expect(command.modifiedDate).to.be.a('string');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "3.4 GET Robot Command - Not Found",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/api/robot-commands/9999", "host": ["{{base_url}}"], "path": ["api", "robot-commands", "9999"] }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 404 Not Found for non-existent command', function () {",
+                  "    pm.response.to.have.status(404);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "3.5 POST Create Robot Command",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"{{new-command-name}}\",\n  \"isMoveCommand\": {{new-command-ismovecommand}},\n  \"description\": \"{{new-command-description}}\"\n}"
+            },
+            "url": { "raw": "{{base_url}}/api/robot-commands", "host": ["{{base_url}}"], "path": ["api", "robot-commands"] }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 201 Created', function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test('Response body is not empty', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.not.eql(undefined);",
+                  "    pm.response.to.not.be.null;",
+                  "    pm.response.to.not.be.undefined;",
+                  "});",
+                  "",
+                  "pm.test('Response body contains the newly created robot command', function () {",
+                  "    var command = pm.response.json();",
+                  "    pm.expect(command).to.have.property('id');",
+                  "    pm.expect(command).to.have.property('name');",
+                  "    pm.expect(command).to.have.property('description');",
+                  "    pm.expect(command).to.have.property('isMoveCommand');",
+                  "});",
+                  "",
+                  "pm.test('Newly created command name matches environment variable', function () {",
+                  "    var command = pm.response.json();",
+                  "    var expectedName = pm.variables.get('new-command-name');",
+                  "    console.log('Expected: ' + expectedName + ', Got: ' + command.name);",
+                  "    pm.expect(command.name).to.equal(expectedName);",
+                  "});",
+                  "",
+                  "pm.test('Newly created command isMoveCommand is correct', function () {",
+                  "    var command = pm.response.json();",
+                  "    pm.expect(command.isMoveCommand).to.eql(false);",
+                  "});",
+                  "",
+                  "pm.test('Location header contains new resource URL', function () {",
+                  "    pm.response.to.have.header('Location');",
+                  "    var command = pm.response.json();",
+                  "    var newResourceUrl = pm.variables.get('base_url') + '/api/robot-commands/' + command.id;",
+                  "    console.log('Location: ' + pm.response.headers.get('Location'));",
+                  "    console.log('Expected: ' + newResourceUrl);",
+                  "});",
+                  "",
+                  "// Save the new command ID for later use",
+                  "pm.environment.set('created_command_id', pm.response.json().id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "3.6 GET Verify Created Command Exists",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/api/robot-commands/{{created_command_id}}", "host": ["{{base_url}}"], "path": ["api", "robot-commands", "{{created_command_id}}"] }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200 OK - created command exists', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Retrieved command matches the one we created', function () {",
+                  "    var command = pm.response.json();",
+                  "    pm.expect(command.name).to.equal(pm.variables.get('new-command-name'));",
+                  "    pm.expect(command.description).to.equal(pm.variables.get('new-command-description'));",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "3.7 PUT Update Robot Command",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"UPDATED_COMMAND\",\n  \"isMoveCommand\": true,\n  \"description\": \"Updated description\"\n}"
+            },
+            "url": { "raw": "{{base_url}}/api/robot-commands/{{created_command_id}}", "host": ["{{base_url}}"], "path": ["api", "robot-commands", "{{created_command_id}}"] }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 204 No Content', function () {",
+                  "    pm.response.to.have.status(204);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "3.8 GET Verify Command Was Updated",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/api/robot-commands/{{created_command_id}}", "host": ["{{base_url}}"], "path": ["api", "robot-commands", "{{created_command_id}}"] }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200 OK', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Command was updated with new values', function () {",
+                  "    var command = pm.response.json();",
+                  "    pm.expect(command.name).to.equal('UPDATED_COMMAND');",
+                  "    pm.expect(command.isMoveCommand).to.be.true;",
+                  "    pm.expect(command.description).to.equal('Updated description');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "3.9 DELETE Robot Command",
+          "request": {
+            "method": "DELETE",
+            "url": { "raw": "{{base_url}}/api/robot-commands/{{created_command_id}}", "host": ["{{base_url}}"], "path": ["api", "robot-commands", "{{created_command_id}}"] }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 204 No Content', function () {",
+                  "    pm.response.to.have.status(204);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "3.10 GET Verify Command Was Deleted",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/api/robot-commands/{{created_command_id}}", "host": ["{{base_url}}"], "path": ["api", "robot-commands", "{{created_command_id}}"] }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 404 Not Found - command was deleted', function () {",
+                  "    pm.response.to.have.status(404);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "3.11 DELETE Non-existent Command - Expect 404",
+          "request": {
+            "method": "DELETE",
+            "url": { "raw": "{{base_url}}/api/robot-commands/9999", "host": ["{{base_url}}"], "path": ["api", "robot-commands", "9999"] }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 404 for deleting non-existent command', function () {",
+                  "    pm.response.to.have.status(404);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "4. Maps",
+      "item": [
+        {
+          "name": "4.1 GET All Maps",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/api/maps", "host": ["{{base_url}}"], "path": ["api", "maps"] }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200 OK', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response body is not empty', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.not.eql(undefined);",
+                  "    pm.response.to.not.be.null;",
+                  "    pm.response.to.not.be.undefined;",
+                  "});",
+                  "",
+                  "pm.test('Response body contains an array of maps', function () {",
+                  "    pm.expect(pm.response.json()).to.be.an('array');",
+                  "});",
+                  "",
+                  "pm.test('Array has at least one map', function () {",
+                  "    pm.expect(pm.response.json().length).to.be.greaterThan(0);",
+                  "});",
+                  "",
+                  "pm.test('Each map contains valid properties', function () {",
+                  "    var maps = pm.response.json();",
+                  "    for (const map of maps) {",
+                  "        pm.expect(map).to.have.property('id');",
+                  "        pm.expect(map).to.have.property('columns');",
+                  "        pm.expect(map).to.have.property('rows');",
+                  "        pm.expect(map).to.have.property('name');",
+                  "        pm.expect(map).to.have.property('createdDate');",
+                  "        pm.expect(map).to.have.property('modifiedDate');",
+                  "    }",
+                  "});",
+                  "",
+                  "pm.test('Property types are correct', function () {",
+                  "    var map = pm.response.json()[0];",
+                  "    pm.expect(map.id).to.be.a('number');",
+                  "    pm.expect(map.columns).to.be.a('number');",
+                  "    pm.expect(map.rows).to.be.a('number');",
+                  "    pm.expect(map.name).to.be.a('string');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "4.2 GET Square Maps Only",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/api/maps/square", "host": ["{{base_url}}"], "path": ["api", "maps", "square"] }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200 OK', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response body is not empty', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.not.eql(undefined);",
+                  "});",
+                  "",
+                  "pm.test('Response body contains an array', function () {",
+                  "    pm.expect(pm.response.json()).to.be.an('array');",
+                  "});",
+                  "",
+                  "pm.test('All returned maps are square (columns == rows)', function () {",
+                  "    var maps = pm.response.json();",
+                  "    for (const map of maps) {",
+                  "        pm.expect(map.columns).to.equal(map.rows);",
+                  "    }",
+                  "});",
+                  "",
+                  "pm.test('Square maps count is correct (2 from seed data)', function () {",
+                  "    pm.expect(pm.response.json().length).to.eql(2);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "4.3 GET Map by ID",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/api/maps/1", "host": ["{{base_url}}"], "path": ["api", "maps", "1"] }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200 OK', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response body is not empty', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.not.eql(undefined);",
+                  "});",
+                  "",
+                  "pm.test('Response is a single object, not an array', function () {",
+                  "    pm.expect(pm.response.json()).to.be.an('object');",
+                  "    pm.expect(pm.response.json()).to.not.be.an('array');",
+                  "});",
+                  "",
+                  "pm.test('Map has correct ID', function () {",
+                  "    pm.expect(pm.response.json().id).to.eql(1);",
+                  "});",
+                  "",
+                  "pm.test('Map has expected properties and types', function () {",
+                  "    var map = pm.response.json();",
+                  "    pm.expect(map.id).to.be.a('number');",
+                  "    pm.expect(map.columns).to.be.a('number');",
+                  "    pm.expect(map.rows).to.be.a('number');",
+                  "    pm.expect(map.name).to.be.a('string');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "4.4 GET Map - Not Found",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/api/maps/9999", "host": ["{{base_url}}"], "path": ["api", "maps", "9999"] }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 404 Not Found for non-existent map', function () {",
+                  "    pm.response.to.have.status(404);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "4.5 Check Coordinate On Map - Valid",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/api/maps/1/2-3", "host": ["{{base_url}}"], "path": ["api", "maps", "1", "2-3"] }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200 OK', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response is a boolean', function () {",
+                  "    pm.expect(pm.response.json()).to.be.a('boolean');",
+                  "});",
+                  "",
+                  "pm.test('Coordinate (2,3) is on map 1 (5x5)', function () {",
+                  "    pm.expect(pm.response.json()).to.be.true;",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "4.6 Check Coordinate Off Map",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/api/maps/1/10-10", "host": ["{{base_url}}"], "path": ["api", "maps", "1", "10-10"] }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200 OK', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Coordinate (10,10) is NOT on map 1 (5x5)', function () {",
+                  "    pm.expect(pm.response.json()).to.be.false;",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "4.7 POST Create Map",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"columns\": {{new-map-columns}},\n  \"rows\": {{new-map-rows}},\n  \"name\": \"{{new-map-name}}\",\n  \"description\": \"{{new-map-description}}\"\n}"
+            },
+            "url": { "raw": "{{base_url}}/api/maps", "host": ["{{base_url}}"], "path": ["api", "maps"] }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 201 Created', function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test('Response body is not empty', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.not.eql(undefined);",
+                  "    pm.response.to.not.be.null;",
+                  "    pm.response.to.not.be.undefined;",
+                  "});",
+                  "",
+                  "pm.test('Response body contains the newly created map', function () {",
+                  "    var map = pm.response.json();",
+                  "    pm.expect(map).to.have.property('id');",
+                  "    pm.expect(map).to.have.property('columns');",
+                  "    pm.expect(map).to.have.property('rows');",
+                  "    pm.expect(map).to.have.property('name');",
+                  "});",
+                  "",
+                  "pm.test('Newly created map values match environment variables', function () {",
+                  "    var map = pm.response.json();",
+                  "    pm.expect(map.name).to.equal(pm.variables.get('new-map-name'));",
+                  "    pm.expect(map.columns).to.eql(parseInt(pm.variables.get('new-map-columns')));",
+                  "    pm.expect(map.rows).to.eql(parseInt(pm.variables.get('new-map-rows')));",
+                  "});",
+                  "",
+                  "pm.test('Location header is present', function () {",
+                  "    pm.response.to.have.header('Location');",
+                  "});",
+                  "",
+                  "pm.environment.set('created_map_id', pm.response.json().id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "4.8 PUT Update Map",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"columns\": 20,\n  \"rows\": 20,\n  \"name\": \"UPDATED_MAP\",\n  \"description\": \"Updated map description\"\n}"
+            },
+            "url": { "raw": "{{base_url}}/api/maps/{{created_map_id}}", "host": ["{{base_url}}"], "path": ["api", "maps", "{{created_map_id}}"] }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 204 No Content', function () {",
+                  "    pm.response.to.have.status(204);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "4.9 GET Verify Map Was Updated",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/api/maps/{{created_map_id}}", "host": ["{{base_url}}"], "path": ["api", "maps", "{{created_map_id}}"] }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200 OK', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Map was updated with new values', function () {",
+                  "    var map = pm.response.json();",
+                  "    pm.expect(map.name).to.equal('UPDATED_MAP');",
+                  "    pm.expect(map.columns).to.eql(20);",
+                  "    pm.expect(map.rows).to.eql(20);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "4.10 DELETE Map",
+          "request": {
+            "method": "DELETE",
+            "url": { "raw": "{{base_url}}/api/maps/{{created_map_id}}", "host": ["{{base_url}}"], "path": ["api", "maps", "{{created_map_id}}"] }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 204 No Content', function () {",
+                  "    pm.response.to.have.status(204);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "4.11 GET Verify Map Was Deleted",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/api/maps/{{created_map_id}}", "host": ["{{base_url}}"], "path": ["api", "maps", "{{created_map_id}}"] }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 404 Not Found - map was deleted', function () {",
+                  "    pm.response.to.have.status(404);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "5. Users",
+      "item": [
+        {
+          "name": "5.1 GET All Users",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/api/users", "host": ["{{base_url}}"], "path": ["api", "users"] }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200 OK', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response body is not empty', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.not.eql(undefined);",
+                  "    pm.response.to.not.be.null;",
+                  "    pm.response.to.not.be.undefined;",
+                  "});",
+                  "",
+                  "pm.test('Response body contains an array of users', function () {",
+                  "    pm.expect(pm.response.json()).to.be.an('array');",
+                  "});",
+                  "",
+                  "pm.test('Array has at least one user', function () {",
+                  "    pm.expect(pm.response.json().length).to.be.greaterThan(0);",
+                  "});",
+                  "",
+                  "pm.test('Each user contains valid properties', function () {",
+                  "    var users = pm.response.json();",
+                  "    for (const user of users) {",
+                  "        pm.expect(user).to.have.property('id');",
+                  "        pm.expect(user).to.have.property('email');",
+                  "        pm.expect(user).to.have.property('firstName');",
+                  "        pm.expect(user).to.have.property('lastName');",
+                  "        pm.expect(user).to.have.property('role');",
+                  "        pm.expect(user).to.have.property('createdDate');",
+                  "        pm.expect(user).to.have.property('modifiedDate');",
+                  "    }",
+                  "});",
+                  "",
+                  "pm.test('Property types are correct', function () {",
+                  "    var user = pm.response.json()[0];",
+                  "    pm.expect(user.id).to.be.a('number');",
+                  "    pm.expect(user.email).to.be.a('string');",
+                  "    pm.expect(user.firstName).to.be.a('string');",
+                  "    pm.expect(user.lastName).to.be.a('string');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "5.2 GET Admin Users",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/api/users/admin", "host": ["{{base_url}}"], "path": ["api", "users", "admin"] }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200 OK', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response body contains an array', function () {",
+                  "    pm.expect(pm.response.json()).to.be.an('array');",
+                  "});",
+                  "",
+                  "pm.test('All returned users have Admin role', function () {",
+                  "    var users = pm.response.json();",
+                  "    for (const user of users) {",
+                  "        pm.expect(user.role).to.equal('Admin');",
+                  "    }",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "5.3 GET User by ID",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/api/users/1", "host": ["{{base_url}}"], "path": ["api", "users", "1"] }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200 OK', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response is a single object, not an array', function () {",
+                  "    pm.expect(pm.response.json()).to.be.an('object');",
+                  "    pm.expect(pm.response.json()).to.not.be.an('array');",
+                  "});",
+                  "",
+                  "pm.test('User has correct ID', function () {",
+                  "    pm.expect(pm.response.json().id).to.eql(1);",
+                  "});",
+                  "",
+                  "pm.test('User has expected properties', function () {",
+                  "    var user = pm.response.json();",
+                  "    pm.expect(user.id).to.be.a('number');",
+                  "    pm.expect(user.email).to.be.a('string');",
+                  "    pm.expect(user.firstName).to.be.a('string');",
+                  "    pm.expect(user.lastName).to.be.a('string');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "5.4 GET User - Not Found",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/api/users/9999", "host": ["{{base_url}}"], "path": ["api", "users", "9999"] }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 404 Not Found for non-existent user', function () {",
+                  "    pm.response.to.have.status(404);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "5.5 POST Register New User",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{new-user-email}}\",\n  \"firstName\": \"{{new-user-firstname}}\",\n  \"lastName\": \"{{new-user-lastname}}\",\n  \"passwordHash\": \"{{new-user-password}}\",\n  \"description\": \"Test user for automated testing\",\n  \"role\": \"User\"\n}"
+            },
+            "url": { "raw": "{{base_url}}/api/users", "host": ["{{base_url}}"], "path": ["api", "users"] }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 201 Created', function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test('Response body is not empty', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.not.eql(undefined);",
+                  "});",
+                  "",
+                  "pm.test('Response body contains the newly created user', function () {",
+                  "    var user = pm.response.json();",
+                  "    pm.expect(user).to.have.property('id');",
+                  "    pm.expect(user).to.have.property('email');",
+                  "    pm.expect(user).to.have.property('firstName');",
+                  "    pm.expect(user).to.have.property('lastName');",
+                  "    pm.expect(user).to.have.property('role');",
+                  "});",
+                  "",
+                  "pm.test('Newly created user email matches', function () {",
+                  "    var user = pm.response.json();",
+                  "    pm.expect(user.email).to.equal(pm.variables.get('new-user-email'));",
+                  "});",
+                  "",
+                  "pm.test('Password hash is not stored as plain text', function () {",
+                  "    var user = pm.response.json();",
+                  "    pm.expect(user.passwordHash).to.not.equal(pm.variables.get('new-user-password'));",
+                  "});",
+                  "",
+                  "pm.test('Location header is present', function () {",
+                  "    pm.response.to.have.header('Location');",
+                  "});",
+                  "",
+                  "pm.environment.set('created_user_id', pm.response.json().id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "5.6 GET Verify New User Can Authenticate",
+          "request": {
+            "auth": {
+              "type": "basic",
+              "basic": [
+                { "key": "username", "value": "testuser@deakin.edu.au", "type": "string" },
+                { "key": "password", "value": "testpass123", "type": "string" }
+              ]
+            },
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/api/robot-commands", "host": ["{{base_url}}"], "path": ["api", "robot-commands"] }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200 - newly registered user can authenticate', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "5.7 PUT Update User (no email/password change)",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"Updated\",\n  \"lastName\": \"Name\",\n  \"description\": \"Updated via PUT\",\n  \"role\": \"User\"\n}"
+            },
+            "url": { "raw": "{{base_url}}/api/users/{{created_user_id}}", "host": ["{{base_url}}"], "path": ["api", "users", "{{created_user_id}}"] }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 204 No Content', function () {",
+                  "    pm.response.to.have.status(204);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "5.8 GET Verify User Was Updated",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/api/users/{{created_user_id}}", "host": ["{{base_url}}"], "path": ["api", "users", "{{created_user_id}}"] }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200 OK', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('User was updated with new values', function () {",
+                  "    var user = pm.response.json();",
+                  "    pm.expect(user.firstName).to.equal('Updated');",
+                  "    pm.expect(user.lastName).to.equal('Name');",
+                  "    pm.expect(user.description).to.equal('Updated via PUT');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "5.9 PATCH Update User Credentials",
+          "request": {
+            "auth": {
+              "type": "basic",
+              "basic": [
+                { "key": "username", "value": "testuser@deakin.edu.au", "type": "string" },
+                { "key": "password", "value": "testpass123", "type": "string" }
+              ]
+            },
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"patched@deakin.edu.au\",\n  \"password\": \"patchedpass123\"\n}"
+            },
+            "url": { "raw": "{{base_url}}/api/users/{{created_user_id}}", "host": ["{{base_url}}"], "path": ["api", "users", "{{created_user_id}}"] }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 204 No Content', function () {",
+                  "    pm.response.to.have.status(204);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "5.10 GET Verify New Credentials Work",
+          "request": {
+            "auth": {
+              "type": "basic",
+              "basic": [
+                { "key": "username", "value": "patched@deakin.edu.au", "type": "string" },
+                { "key": "password", "value": "patchedpass123", "type": "string" }
+              ]
+            },
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/api/users/{{created_user_id}}", "host": ["{{base_url}}"], "path": ["api", "users", "{{created_user_id}}"] }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200 - patched credentials work', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Email was updated via PATCH', function () {",
+                  "    pm.expect(pm.response.json().email).to.equal('patched@deakin.edu.au');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "5.11 GET Verify Old Credentials No Longer Work",
+          "request": {
+            "auth": {
+              "type": "basic",
+              "basic": [
+                { "key": "username", "value": "testuser@deakin.edu.au", "type": "string" },
+                { "key": "password", "value": "testpass123", "type": "string" }
+              ]
+            },
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/api/users/{{created_user_id}}", "host": ["{{base_url}}"], "path": ["api", "users", "{{created_user_id}}"] }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 401 - old credentials no longer work after PATCH', function () {",
+                  "    pm.response.to.have.status(401);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "5.12 DELETE User",
+          "request": {
+            "method": "DELETE",
+            "url": { "raw": "{{base_url}}/api/users/{{created_user_id}}", "host": ["{{base_url}}"], "path": ["api", "users", "{{created_user_id}}"] }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 204 No Content', function () {",
+                  "    pm.response.to.have.status(204);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "5.13 GET Verify User Was Deleted",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/api/users/{{created_user_id}}", "host": ["{{base_url}}"], "path": ["api", "users", "{{created_user_id}}"] }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 404 Not Found - user was deleted', function () {",
+                  "    pm.response.to.have.status(404);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

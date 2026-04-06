@@ -2,7 +2,7 @@
 -- PostgreSQL database dump
 --
 
-\restrict LZ6XIJ63saq3BMQcwT3sjINt2BfDYysNkXnvSbcznAOmZhtHFaxhunHCRzxgGTO
+\restrict V3EbEDSkHFZtgSJ6hccr48tJQ6SRx7C21CBusXA6wd43jyRHhsooVoJI35DvnzV
 
 -- Dumped from database version 14.22 (Debian 14.22-1.pgdg13+1)
 -- Dumped by pg_dump version 14.22 (Debian 14.22-1.pgdg13+1)
@@ -138,6 +138,8 @@ COPY public.robotcommand (id, "Name", description, ismovecommand, createddate, m
 3	MOVE	Move the robot one step forward	t	2022-07-30 00:00:00	2022-07-30 00:00:00
 4	PLACE	Place the robot at X,Y facing direction D	f	2022-07-30 00:00:00	2022-07-30 00:00:00
 5	REPORT	Report the current position of the robot	f	2022-07-30 00:00:00	2022-07-30 00:00:00
+6	SPIN	Spin in circles	f	2026-04-06 14:15:04.739744	2026-04-06 14:15:04.742405
+7	SPIN	Spin in circles	f	2026-04-06 14:26:24.730432	2026-04-06 14:26:24.732648
 \.
 
 
@@ -147,7 +149,7 @@ COPY public.robotcommand (id, "Name", description, ismovecommand, createddate, m
 
 COPY public."user" (id, email, firstname, lastname, passwordhash, description, role, createddate, modifieddate) FROM stdin;
 1	admin@deakin.edu.au	Admin	User	AQAAAAIAAYagAAAAEAIcsGUs1W8GPnpnpuR7eBzAFVrE1OiExwfkB4VVlcDAf8oh4Gc7q+ThFCBFrATSpw==	Administrator account	Admin	2022-07-30 00:00:00	2022-07-30 00:00:00
-2	user@deakin.edu.au	Regular	User	AQAAAAIAAYagAAAAEMxnyQZ74TxLEtBJ6WTuHWQ0xcLucsshoQRuwwenEuqjCgBjmWHADOQnTzDwZs1qRw==	Regular user account	User	2022-07-30 00:00:00	2022-07-30 00:00:00
+2	user@deakin.edu.au	Updated	Name	AQAAAAIAAYagAAAAEBSWx5RM/VP1SVXWTSEc4wueJJxptjuE3AhGC3AMgq8dwLLkfJ4HDzvjJnLbcD+WAg==	Updated description	User	2022-07-30 00:00:00	2022-07-30 00:00:00
 \.
 
 
@@ -155,26 +157,26 @@ COPY public."user" (id, email, firstname, lastname, passwordhash, description, r
 -- Name: map_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.map_id_seq', 3, true);
+SELECT pg_catalog.setval('public.map_id_seq', 4, true);
 
 
 --
 -- Name: robotcommand_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.robotcommand_id_seq', 5, true);
+SELECT pg_catalog.setval('public.robotcommand_id_seq', 8, true);
 
 
 --
 -- Name: user_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.user_id_seq', 2, true);
+SELECT pg_catalog.setval('public.user_id_seq', 5, true);
 
 
 --
 -- PostgreSQL database dump complete
 --
 
-\unrestrict LZ6XIJ63saq3BMQcwT3sjINt2BfDYysNkXnvSbcznAOmZhtHFaxhunHCRzxgGTO
+\unrestrict V3EbEDSkHFZtgSJ6hccr48tJQ6SRx7C21CBusXA6wd43jyRHhsooVoJI35DvnzV
 
