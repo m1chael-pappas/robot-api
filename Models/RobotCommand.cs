@@ -9,6 +9,9 @@ public class RobotCommand(
     string? description = null
 )
 {
+    public RobotCommand()
+        : this(0, "", false, DateTime.MinValue, DateTime.MinValue) { }
+
     public int Id { get; set; } = id;
     public string Name { get; set; } = name;
     public string? Description { get; set; } = description;

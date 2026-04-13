@@ -3,9 +3,12 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.OpenApi;
 using robot_api.Authentication;
+using robot_api.Persistence;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
+builder.Services.AddScoped<IRobotCommandDataAccess, RobotCommandRepository>();
+builder.Services.AddScoped<IMapDataAccess, MapRepository>();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
 {

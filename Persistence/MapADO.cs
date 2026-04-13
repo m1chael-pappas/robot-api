@@ -3,12 +3,12 @@ using robot_api.Models;
 
 namespace robot_api.Persistence;
 
-public static class MapDataAccess
+public class MapADO : IMapDataAccess
 {
     private const string CONNECTION_STRING =
         "Host=localhost;Username=postgres;Password=;Database=sit331";
 
-    private static Map ReadMap(NpgsqlDataReader dr)
+    private Map ReadMap(NpgsqlDataReader dr)
     {
         return new Map(
             (int)dr["id"],
@@ -21,7 +21,7 @@ public static class MapDataAccess
         );
     }
 
-    public static List<Map> GetMaps()
+    public List<Map> GetMaps()
     {
         var maps = new List<Map>();
         using var conn = new NpgsqlConnection(CONNECTION_STRING);
@@ -35,7 +35,7 @@ public static class MapDataAccess
         return maps;
     }
 
-    public static List<Map> GetSquareMaps()
+    public List<Map> GetSquareMaps()
     {
         var maps = new List<Map>();
         using var conn = new NpgsqlConnection(CONNECTION_STRING);
@@ -49,7 +49,7 @@ public static class MapDataAccess
         return maps;
     }
 
-    public static Map? GetMapById(int id)
+    public Map? GetMapById(int id)
     {
         using var conn = new NpgsqlConnection(CONNECTION_STRING);
         conn.Open();
@@ -63,7 +63,7 @@ public static class MapDataAccess
         return null;
     }
 
-    public static Map InsertMap(Map map)
+    public Map InsertMap(Map map)
     {
         using var conn = new NpgsqlConnection(CONNECTION_STRING);
         conn.Open();
@@ -84,7 +84,7 @@ public static class MapDataAccess
         return map;
     }
 
-    public static void UpdateMap(int id, Map map)
+    public void UpdateMap(int id, Map map)
     {
         using var conn = new NpgsqlConnection(CONNECTION_STRING);
         conn.Open();
@@ -103,7 +103,7 @@ public static class MapDataAccess
         cmd.ExecuteNonQuery();
     }
 
-    public static bool DeleteMap(int id)
+    public bool DeleteMap(int id)
     {
         using var conn = new NpgsqlConnection(CONNECTION_STRING);
         conn.Open();

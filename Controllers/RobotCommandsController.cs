@@ -10,8 +10,10 @@ namespace robot_api.Controllers;
 /// </summary>
 [ApiController]
 [Route("api/robot-commands")]
-public class RobotCommandsController : ControllerBase
+public class RobotCommandsController(IRobotCommandDataAccess robotCommandsRepo) : ControllerBase
 {
+    private readonly IRobotCommandDataAccess _robotCommandsRepo = robotCommandsRepo;
+
     /// <summary>
     /// Retrieves all robot commands.
     /// </summary>
@@ -21,7 +23,7 @@ public class RobotCommandsController : ControllerBase
     [HttpGet, Authorize(Policy = "UserOnly")]
     public IEnumerable<RobotCommand> GetAllRobotCommands()
     {
-        return RobotCommandDataAccess.GetRobotCommands();
+        return _robotCommandsRepo.GetRobotCommands();
     }
 
     /// <summary>
@@ -33,7 +35,7 @@ public class RobotCommandsController : ControllerBase
     [HttpGet("move"), Authorize(Policy = "UserOnly")]
     public IEnumerable<RobotCommand> GetMoveCommandsOnly()
     {
-        return RobotCommandDataAccess.GetMoveCommands();
+        return _robotCommandsRepo.GetMoveCommands();
     }
 
     /// <summary>
@@ -48,7 +50,7 @@ public class RobotCommandsController : ControllerBase
     [HttpGet("{id}", Name = "GetRobotCommand"), Authorize(Policy = "UserOnly")]
     public IActionResult GetRobotCommandById(int id)
     {
-        var command = RobotCommandDataAccess.GetRobotCommandById(id);
+        var command = _robotCommandsRepo.GetRobotCommandById(id);
         if (command == null)
             return NotFound();
 
@@ -83,7 +85,7 @@ public class RobotCommandsController : ControllerBase
         if (newCommand == null)
             return BadRequest();
 
-        var command = RobotCommandDataAccess.InsertRobotCommand(newCommand);
+        var command = _robotCommandsRepo.InsertRobotCommand(newCommand);
 
         return CreatedAtRoute("GetRobotCommand", new { id = command.Id }, command);
     }
@@ -103,14 +105,14 @@ public class RobotCommandsController : ControllerBase
     [HttpPut("{id}"), Authorize(Policy = "AdminOnly")]
     public IActionResult UpdateRobotCommand(int id, RobotCommand updatedCommand)
     {
-        var command = RobotCommandDataAccess.GetRobotCommandById(id);
+        var command = _robotCommandsRepo.GetRobotCommandById(id);
         if (command == null)
             return NotFound();
 
         if (updatedCommand == null)
             return BadRequest();
 
-        RobotCommandDataAccess.UpdateRobotCommand(id, updatedCommand);
+        _robotCommandsRepo.UpdateRobotCommand(id, updatedCommand);
 
         return NoContent();
     }
@@ -127,7 +129,7 @@ public class RobotCommandsController : ControllerBase
     [HttpDelete("{id}"), Authorize(Policy = "AdminOnly")]
     public IActionResult DeleteRobotCommand(int id)
     {
-        var deleted = RobotCommandDataAccess.DeleteRobotCommand(id);
+        var deleted = _robotCommandsRepo.DeleteRobotCommand(id);
         if (!deleted)
             return NotFound();
 

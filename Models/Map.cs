@@ -10,6 +10,8 @@ public class Map(
     string? description = null
 )
 {
+    public Map() : this(0, 0, 0, "", DateTime.MinValue, DateTime.MinValue) { }
+
     public int Id { get; set; } = id;
     public int Columns { get; set; } = columns;
     public int Rows { get; set; } = rows;

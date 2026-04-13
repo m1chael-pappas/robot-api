@@ -10,8 +10,10 @@ namespace robot_api.Controllers;
 /// </summary>
 [ApiController]
 [Route("api/maps")]
-public class MapsController : ControllerBase
+public class MapsController(IMapDataAccess mapsRepo) : ControllerBase
 {
+    private readonly IMapDataAccess _mapsRepo = mapsRepo;
+
     /// <summary>
     /// Retrieves all maps.
     /// </summary>
@@ -21,7 +23,7 @@ public class MapsController : ControllerBase
     [HttpGet, Authorize(Policy = "UserOnly")]
     public IEnumerable<Map> GetAllMaps()
     {
-        return MapDataAccess.GetMaps();
+        return _mapsRepo.GetMaps();
     }
 
     /// <summary>
@@ -33,7 +35,7 @@ public class MapsController : ControllerBase
     [HttpGet("square"), Authorize(Policy = "UserOnly")]
     public IEnumerable<Map> GetSquareMapsOnly()
     {
-        return MapDataAccess.GetSquareMaps();
+        return _mapsRepo.GetSquareMaps();
     }
 
     /// <summary>
@@ -48,7 +50,7 @@ public class MapsController : ControllerBase
     [HttpGet("{id}", Name = "GetMap"), Authorize(Policy = "UserOnly")]
     public IActionResult GetMapById(int id)
     {
-        var map = MapDataAccess.GetMapById(id);
+        var map = _mapsRepo.GetMapById(id);
         if (map == null)
             return NotFound();
 
@@ -82,7 +84,7 @@ public class MapsController : ControllerBase
         if (newMap == null)
             return BadRequest();
 
-        var map = MapDataAccess.InsertMap(newMap);
+        var map = _mapsRepo.InsertMap(newMap);
 
         return CreatedAtRoute("GetMap", new { id = map.Id }, map);
     }
@@ -102,14 +104,14 @@ public class MapsController : ControllerBase
     [HttpPut("{id}"), Authorize(Policy = "AdminOnly")]
     public IActionResult UpdateMap(int id, Map updatedMap)
     {
-        var map = MapDataAccess.GetMapById(id);
+        var map = _mapsRepo.GetMapById(id);
         if (map == null)
             return NotFound();
 
         if (updatedMap == null)
             return BadRequest();
 
-        MapDataAccess.UpdateMap(id, updatedMap);
+        _mapsRepo.UpdateMap(id, updatedMap);
 
         return NoContent();
     }
@@ -126,7 +128,7 @@ public class MapsController : ControllerBase
     [HttpDelete("{id}"), Authorize(Policy = "AdminOnly")]
     public IActionResult DeleteMap(int id)
     {
-        var deleted = MapDataAccess.DeleteMap(id);
+        var deleted = _mapsRepo.DeleteMap(id);
         if (!deleted)
             return NotFound();
 
@@ -152,7 +154,7 @@ public class MapsController : ControllerBase
         if (x < 0 || y < 0)
             return BadRequest();
 
-        var map = MapDataAccess.GetMapById(id);
+        var map = _mapsRepo.GetMapById(id);
         if (map == null)
             return NotFound();
 

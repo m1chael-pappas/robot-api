@@ -3,12 +3,12 @@ using robot_api.Models;
 
 namespace robot_api.Persistence;
 
-public static class RobotCommandDataAccess
+public class RobotCommandADO : IRobotCommandDataAccess
 {
     private const string CONNECTION_STRING =
         "Host=localhost;Username=postgres;Password=;Database=sit331";
 
-    private static RobotCommand ReadRobotCommand(NpgsqlDataReader dr)
+    private RobotCommand ReadRobotCommand(NpgsqlDataReader dr)
     {
         return new RobotCommand(
             (int)dr["id"],
@@ -20,7 +20,7 @@ public static class RobotCommandDataAccess
         );
     }
 
-    public static List<RobotCommand> GetRobotCommands()
+    public List<RobotCommand> GetRobotCommands()
     {
         var robotCommands = new List<RobotCommand>();
         using var conn = new NpgsqlConnection(CONNECTION_STRING);
@@ -34,7 +34,7 @@ public static class RobotCommandDataAccess
         return robotCommands;
     }
 
-    public static List<RobotCommand> GetMoveCommands()
+    public List<RobotCommand> GetMoveCommands()
     {
         var robotCommands = new List<RobotCommand>();
         using var conn = new NpgsqlConnection(CONNECTION_STRING);
@@ -51,7 +51,7 @@ public static class RobotCommandDataAccess
         return robotCommands;
     }
 
-    public static RobotCommand? GetRobotCommandById(int id)
+    public RobotCommand? GetRobotCommandById(int id)
     {
         using var conn = new NpgsqlConnection(CONNECTION_STRING);
         conn.Open();
@@ -65,7 +65,7 @@ public static class RobotCommandDataAccess
         return null;
     }
 
-    public static RobotCommand InsertRobotCommand(RobotCommand robotCommand)
+    public RobotCommand InsertRobotCommand(RobotCommand robotCommand)
     {
         using var conn = new NpgsqlConnection(CONNECTION_STRING);
         conn.Open();
@@ -88,7 +88,7 @@ public static class RobotCommandDataAccess
         return robotCommand;
     }
 
-    public static void UpdateRobotCommand(int id, RobotCommand robotCommand)
+    public void UpdateRobotCommand(int id, RobotCommand robotCommand)
     {
         using var conn = new NpgsqlConnection(CONNECTION_STRING);
         conn.Open();
@@ -109,7 +109,7 @@ public static class RobotCommandDataAccess
         cmd.ExecuteNonQuery();
     }
 
-    public static bool DeleteRobotCommand(int id)
+    public bool DeleteRobotCommand(int id)
     {
         using var conn = new NpgsqlConnection(CONNECTION_STRING);
         conn.Open();
