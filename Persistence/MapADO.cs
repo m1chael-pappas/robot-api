@@ -5,20 +5,20 @@ namespace robot_api.Persistence;
 
 public class MapADO : IMapDataAccess
 {
-    private const string CONNECTION_STRING =
-        "Host=localhost;Username=postgres;Password=;Database=sit331";
+    private static string CONNECTION_STRING => DbConfig.ConnectionString;
 
     private Map ReadMap(NpgsqlDataReader dr)
     {
-        return new Map(
-            (int)dr["id"],
-            (int)dr["columns"],
-            (int)dr["rows"],
-            (string)dr["Name"],
-            (DateTime)dr["createddate"],
-            (DateTime)dr["modifieddate"],
-            dr["description"] as string
-        );
+        return new Map
+        {
+            Id = (int)dr["id"],
+            Columns = (int)dr["columns"],
+            Rows = (int)dr["rows"],
+            Name = (string)dr["name"],
+            Description = dr["description"] as string,
+            CreatedDate = (DateTime)dr["created_date"],
+            ModifiedDate = (DateTime)dr["modified_date"],
+        };
     }
 
     public List<Map> GetMaps()
@@ -40,7 +40,7 @@ public class MapADO : IMapDataAccess
         var maps = new List<Map>();
         using var conn = new NpgsqlConnection(CONNECTION_STRING);
         conn.Open();
-        using var cmd = new NpgsqlCommand("SELECT * FROM map WHERE issquare = true", conn);
+        using var cmd = new NpgsqlCommand("SELECT * FROM map WHERE is_square = true", conn);
         using var dr = cmd.ExecuteReader();
         while (dr.Read())
         {
@@ -68,8 +68,8 @@ public class MapADO : IMapDataAccess
         using var conn = new NpgsqlConnection(CONNECTION_STRING);
         conn.Open();
         using var cmd = new NpgsqlCommand(
-            @"INSERT INTO map (columns, rows, ""Name"", description, createddate, modifieddate)
-              VALUES (@columns, @rows, @name, @description, @createddate, @modifieddate)
+            @"INSERT INTO map (columns, rows, name, description, created_date, modified_date)
+              VALUES (@columns, @rows, @name, @description, @created_date, @modified_date)
               RETURNING id",
             conn
         );
@@ -77,8 +77,8 @@ public class MapADO : IMapDataAccess
         cmd.Parameters.AddWithValue("rows", map.Rows);
         cmd.Parameters.AddWithValue("name", map.Name);
         cmd.Parameters.AddWithValue("description", (object?)map.Description ?? DBNull.Value);
-        cmd.Parameters.AddWithValue("createddate", DateTime.Now);
-        cmd.Parameters.AddWithValue("modifieddate", DateTime.Now);
+        cmd.Parameters.AddWithValue("created_date", DateTime.Now);
+        cmd.Parameters.AddWithValue("modified_date", DateTime.Now);
         var id = (int)cmd.ExecuteScalar()!;
         map.Id = id;
         return map;
@@ -89,8 +89,8 @@ public class MapADO : IMapDataAccess
         using var conn = new NpgsqlConnection(CONNECTION_STRING);
         conn.Open();
         using var cmd = new NpgsqlCommand(
-            @"UPDATE map SET columns = @columns, rows = @rows, ""Name"" = @name,
-              description = @description, modifieddate = @modifieddate
+            @"UPDATE map SET columns = @columns, rows = @rows, name = @name,
+              description = @description, modified_date = @modified_date
               WHERE id = @id",
             conn
         );
@@ -99,7 +99,7 @@ public class MapADO : IMapDataAccess
         cmd.Parameters.AddWithValue("rows", map.Rows);
         cmd.Parameters.AddWithValue("name", map.Name);
         cmd.Parameters.AddWithValue("description", (object?)map.Description ?? DBNull.Value);
-        cmd.Parameters.AddWithValue("modifieddate", DateTime.Now);
+        cmd.Parameters.AddWithValue("modified_date", DateTime.Now);
         cmd.ExecuteNonQuery();
     }
 

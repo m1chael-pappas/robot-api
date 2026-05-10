@@ -14,7 +14,7 @@ public class MapRepository : IMapDataAccess, IRepository
 
     public List<Map> GetSquareMaps()
     {
-        return _repo.ExecuteReader<Map>("SELECT * FROM public.map WHERE issquare = true");
+        return _repo.ExecuteReader<Map>("SELECT * FROM public.map WHERE is_square = true");
     }
 
     public Map? GetMapById(int id)
@@ -35,7 +35,7 @@ public class MapRepository : IMapDataAccess, IRepository
         };
         var result = _repo
             .ExecuteReader<Map>(
-                @"INSERT INTO map (columns, rows, ""Name"", description, createddate, modifieddate)
+                @"INSERT INTO map (columns, rows, name, description, created_date, modified_date)
               VALUES (@columns, @rows, @name, @description, current_timestamp, current_timestamp)
               RETURNING *;",
                 sqlParams
@@ -55,8 +55,8 @@ public class MapRepository : IMapDataAccess, IRepository
             new("description", updatedMap.Description ?? (object)DBNull.Value),
         };
         _repo.ExecuteReader<Map>(
-            @"UPDATE map SET columns=@columns, rows=@rows, ""Name""=@name,
-              description=@description, modifieddate=current_timestamp
+            @"UPDATE map SET columns=@columns, rows=@rows, name=@name,
+              description=@description, modified_date=current_timestamp
               WHERE id=@id RETURNING *;",
             sqlParams
         );

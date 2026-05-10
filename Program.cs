@@ -1,6 +1,7 @@
 using System.Reflection;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi;
 using robot_api.Authentication;
 using robot_api.Persistence;
@@ -8,16 +9,23 @@ using robot_api.Persistence;
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 
-// 4.1P:
+DbConfig.ConnectionString =
+    builder.Configuration.GetConnectionString("Default")
+    ?? throw new InvalidOperationException("ConnectionStrings:Default is not configured.");
+
+// Toggle the active persistence layer for the demo by uncommenting one block.
+// 4.1P (ADO.NET):
 // builder.Services.AddScoped<IRobotCommandDataAccess, RobotCommandADO>();
 // builder.Services.AddScoped<IMapDataAccess, MapADO>();
-// 4.2C:
+// 4.2C (FastMember + IRepository):
 // builder.Services.AddScoped<IRobotCommandDataAccess, RobotCommandRepository>();
 // builder.Services.AddScoped<IMapDataAccess, MapRepository>();
-// 4.3D:
+// 4.3D / 4.4HD (EF Core, snake_case → PascalCase via Handlebars-templated scaffold):
 builder.Services.AddScoped<IRobotCommandDataAccess, RobotCommandEF>();
 builder.Services.AddScoped<IMapDataAccess, MapEF>();
-builder.Services.AddScoped<RobotContext>();
+builder.Services.AddDbContext<RobotContext>(options =>
+    options.UseNpgsql(DbConfig.ConnectionString)
+);
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
 {

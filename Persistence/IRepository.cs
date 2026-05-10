@@ -4,14 +4,11 @@ namespace robot_api.Persistence;
 
 public interface IRepository
 {
-    private const string CONNECTION_STRING =
-        "Host=localhost;Username=postgres;Password=;Database=sit331";
-
     public List<T> ExecuteReader<T>(string sqlCommand, NpgsqlParameter[]? dbParams = null)
         where T : class, new()
     {
         var entities = new List<T>();
-        using var conn = new NpgsqlConnection(CONNECTION_STRING);
+        using var conn = new NpgsqlConnection(DbConfig.ConnectionString);
         conn.Open();
         using var cmd = new NpgsqlCommand(sqlCommand, conn);
         if (dbParams is not null)

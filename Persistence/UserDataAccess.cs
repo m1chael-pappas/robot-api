@@ -5,8 +5,7 @@ namespace robot_api.Persistence;
 
 public static class UserDataAccess
 {
-    private const string CONNECTION_STRING =
-        "Host=localhost;Username=postgres;Password=;Database=sit331";
+    private static string CONNECTION_STRING => DbConfig.ConnectionString;
 
     private static UserModel ReadUser(NpgsqlDataReader dr)
     {

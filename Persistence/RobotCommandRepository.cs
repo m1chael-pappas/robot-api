@@ -9,13 +9,13 @@ public class RobotCommandRepository : IRobotCommandDataAccess, IRepository
 
     public List<RobotCommand> GetRobotCommands()
     {
-        return _repo.ExecuteReader<RobotCommand>("SELECT * FROM public.robotcommand");
+        return _repo.ExecuteReader<RobotCommand>("SELECT * FROM public.robot_command");
     }
 
     public List<RobotCommand> GetMoveCommands()
     {
         return _repo.ExecuteReader<RobotCommand>(
-            "SELECT * FROM public.robotcommand WHERE ismovecommand = true"
+            "SELECT * FROM public.robot_command WHERE is_move_command = true"
         );
     }
 
@@ -23,7 +23,7 @@ public class RobotCommandRepository : IRobotCommandDataAccess, IRepository
     {
         var sqlParams = new NpgsqlParameter[] { new("id", id) };
         var result = _repo.ExecuteReader<RobotCommand>(
-            "SELECT * FROM public.robotcommand WHERE id = @id",
+            "SELECT * FROM public.robot_command WHERE id = @id",
             sqlParams
         );
         return result.FirstOrDefault();
@@ -35,12 +35,12 @@ public class RobotCommandRepository : IRobotCommandDataAccess, IRepository
         {
             new("name", robotCommand.Name),
             new("description", robotCommand.Description ?? (object)DBNull.Value),
-            new("ismovecommand", robotCommand.IsMoveCommand),
+            new("is_move_command", robotCommand.IsMoveCommand),
         };
         var result = _repo
             .ExecuteReader<RobotCommand>(
-                @"INSERT INTO robotcommand (""Name"", description, ismovecommand, createddate, modifieddate)
-              VALUES (@name, @description, @ismovecommand, current_timestamp, current_timestamp)
+                @"INSERT INTO robot_command (name, description, is_move_command, created_date, modified_date)
+              VALUES (@name, @description, @is_move_command, current_timestamp, current_timestamp)
               RETURNING *;",
                 sqlParams
             )
@@ -55,11 +55,11 @@ public class RobotCommandRepository : IRobotCommandDataAccess, IRepository
             new("id", id),
             new("name", updatedCommand.Name),
             new("description", updatedCommand.Description ?? (object)DBNull.Value),
-            new("ismovecommand", updatedCommand.IsMoveCommand),
+            new("is_move_command", updatedCommand.IsMoveCommand),
         };
         _repo.ExecuteReader<RobotCommand>(
-            @"UPDATE robotcommand SET ""Name""=@name, description=@description,
-              ismovecommand=@ismovecommand, modifieddate=current_timestamp
+            @"UPDATE robot_command SET name=@name, description=@description,
+              is_move_command=@is_move_command, modified_date=current_timestamp
               WHERE id=@id RETURNING *;",
             sqlParams
         );
@@ -69,7 +69,7 @@ public class RobotCommandRepository : IRobotCommandDataAccess, IRepository
     {
         var sqlParams = new NpgsqlParameter[] { new("id", id) };
         var result = _repo.ExecuteReader<RobotCommand>(
-            "DELETE FROM robotcommand WHERE id=@id RETURNING *;",
+            "DELETE FROM robot_command WHERE id=@id RETURNING *;",
             sqlParams
         );
         return result.Count > 0;
