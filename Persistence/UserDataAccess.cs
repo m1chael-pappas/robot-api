@@ -13,13 +13,13 @@ public static class UserDataAccess
         {
             Id = (int)dr["id"],
             Email = (string)dr["email"],
-            FirstName = (string)dr["firstname"],
-            LastName = (string)dr["lastname"],
-            PasswordHash = (string)dr["passwordhash"],
+            FirstName = (string)dr["first_name"],
+            LastName = (string)dr["last_name"],
+            PasswordHash = (string)dr["password_hash"],
             Description = dr["description"] as string,
             Role = dr["role"] as string,
-            CreatedDate = (DateTime)dr["createddate"],
-            ModifiedDate = (DateTime)dr["modifieddate"],
+            CreatedDate = (DateTime)dr["created_date"],
+            ModifiedDate = (DateTime)dr["modified_date"],
         };
     }
 
@@ -28,7 +28,7 @@ public static class UserDataAccess
         var users = new List<UserModel>();
         using var conn = new NpgsqlConnection(CONNECTION_STRING);
         conn.Open();
-        using var cmd = new NpgsqlCommand("SELECT * FROM public.user", conn);
+        using var cmd = new NpgsqlCommand("SELECT * FROM public.\"user\"", conn);
         using var dr = cmd.ExecuteReader();
         while (dr.Read())
         {
@@ -42,7 +42,10 @@ public static class UserDataAccess
         var users = new List<UserModel>();
         using var conn = new NpgsqlConnection(CONNECTION_STRING);
         conn.Open();
-        using var cmd = new NpgsqlCommand("SELECT * FROM public.user WHERE role = 'Admin'", conn);
+        using var cmd = new NpgsqlCommand(
+            "SELECT * FROM public.\"user\" WHERE role = 'Admin'",
+            conn
+        );
         using var dr = cmd.ExecuteReader();
         while (dr.Read())
         {
@@ -55,7 +58,7 @@ public static class UserDataAccess
     {
         using var conn = new NpgsqlConnection(CONNECTION_STRING);
         conn.Open();
-        using var cmd = new NpgsqlCommand("SELECT * FROM public.user WHERE id = @id", conn);
+        using var cmd = new NpgsqlCommand("SELECT * FROM public.\"user\" WHERE id = @id", conn);
         cmd.Parameters.AddWithValue("id", id);
         using var dr = cmd.ExecuteReader();
         if (dr.Read())
@@ -69,7 +72,10 @@ public static class UserDataAccess
     {
         using var conn = new NpgsqlConnection(CONNECTION_STRING);
         conn.Open();
-        using var cmd = new NpgsqlCommand("SELECT * FROM public.user WHERE email = @email", conn);
+        using var cmd = new NpgsqlCommand(
+            "SELECT * FROM public.\"user\" WHERE email = @email",
+            conn
+        );
         cmd.Parameters.AddWithValue("email", email);
         using var dr = cmd.ExecuteReader();
         if (dr.Read())
@@ -84,19 +90,19 @@ public static class UserDataAccess
         using var conn = new NpgsqlConnection(CONNECTION_STRING);
         conn.Open();
         using var cmd = new NpgsqlCommand(
-            @"INSERT INTO public.user (email, firstname, lastname, passwordhash, description, role, createddate, modifieddate)
-              VALUES (@email, @firstname, @lastname, @passwordhash, @description, @role, @createddate, @modifieddate)
+            @"INSERT INTO public.""user"" (email, first_name, last_name, password_hash, description, role, created_date, modified_date)
+              VALUES (@email, @first_name, @last_name, @password_hash, @description, @role, @created_date, @modified_date)
               RETURNING id",
             conn
         );
         cmd.Parameters.AddWithValue("email", user.Email);
-        cmd.Parameters.AddWithValue("firstname", user.FirstName);
-        cmd.Parameters.AddWithValue("lastname", user.LastName);
-        cmd.Parameters.AddWithValue("passwordhash", user.PasswordHash);
+        cmd.Parameters.AddWithValue("first_name", user.FirstName);
+        cmd.Parameters.AddWithValue("last_name", user.LastName);
+        cmd.Parameters.AddWithValue("password_hash", user.PasswordHash);
         cmd.Parameters.AddWithValue("description", (object?)user.Description ?? DBNull.Value);
         cmd.Parameters.AddWithValue("role", (object?)user.Role ?? DBNull.Value);
-        cmd.Parameters.AddWithValue("createddate", DateTime.Now);
-        cmd.Parameters.AddWithValue("modifieddate", DateTime.Now);
+        cmd.Parameters.AddWithValue("created_date", DateTime.Now);
+        cmd.Parameters.AddWithValue("modified_date", DateTime.Now);
         var id = (int)cmd.ExecuteScalar()!;
         user.Id = id;
         return user;
@@ -107,17 +113,17 @@ public static class UserDataAccess
         using var conn = new NpgsqlConnection(CONNECTION_STRING);
         conn.Open();
         using var cmd = new NpgsqlCommand(
-            @"UPDATE public.user SET firstname = @firstname, lastname = @lastname,
-              description = @description, role = @role, modifieddate = @modifieddate
+            @"UPDATE public.""user"" SET first_name = @first_name, last_name = @last_name,
+              description = @description, role = @role, modified_date = @modified_date
               WHERE id = @id",
             conn
         );
         cmd.Parameters.AddWithValue("id", id);
-        cmd.Parameters.AddWithValue("firstname", user.FirstName);
-        cmd.Parameters.AddWithValue("lastname", user.LastName);
+        cmd.Parameters.AddWithValue("first_name", user.FirstName);
+        cmd.Parameters.AddWithValue("last_name", user.LastName);
         cmd.Parameters.AddWithValue("description", (object?)user.Description ?? DBNull.Value);
         cmd.Parameters.AddWithValue("role", (object?)user.Role ?? DBNull.Value);
-        cmd.Parameters.AddWithValue("modifieddate", DateTime.Now);
+        cmd.Parameters.AddWithValue("modified_date", DateTime.Now);
         cmd.ExecuteNonQuery();
     }
 
@@ -125,7 +131,7 @@ public static class UserDataAccess
     {
         using var conn = new NpgsqlConnection(CONNECTION_STRING);
         conn.Open();
-        using var cmd = new NpgsqlCommand("DELETE FROM public.user WHERE id = @id", conn);
+        using var cmd = new NpgsqlCommand("DELETE FROM public.\"user\" WHERE id = @id", conn);
         cmd.Parameters.AddWithValue("id", id);
         return cmd.ExecuteNonQuery() > 0;
     }
@@ -135,14 +141,14 @@ public static class UserDataAccess
         using var conn = new NpgsqlConnection(CONNECTION_STRING);
         conn.Open();
         using var cmd = new NpgsqlCommand(
-            @"UPDATE public.user SET email = @email, passwordhash = @passwordhash,
-              modifieddate = @modifieddate WHERE id = @id",
+            @"UPDATE public.""user"" SET email = @email, password_hash = @password_hash,
+              modified_date = @modified_date WHERE id = @id",
             conn
         );
         cmd.Parameters.AddWithValue("id", id);
         cmd.Parameters.AddWithValue("email", email);
-        cmd.Parameters.AddWithValue("passwordhash", passwordHash);
-        cmd.Parameters.AddWithValue("modifieddate", DateTime.Now);
+        cmd.Parameters.AddWithValue("password_hash", passwordHash);
+        cmd.Parameters.AddWithValue("modified_date", DateTime.Now);
         cmd.ExecuteNonQuery();
     }
 }

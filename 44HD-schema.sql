@@ -99,23 +99,42 @@ ALTER TABLE ONLY public.robot_command
 
 --
 -- Name: user; Type: TABLE; Schema: public; Owner: postgres
--- (Unchanged from 4.3D - authentication code maps these columns manually.)
+-- All columns use snake_case so the whole 4.4HD schema is consistent across every
+-- table. UserDataAccess maps these columns manually (no scaffolding for this table).
 --
 
-CREATE TABLE IF NOT EXISTS public."user" (
+DROP TABLE IF EXISTS public."user" CASCADE;
+
+CREATE TABLE public."user" (
     id integer NOT NULL,
     email character varying(100) NOT NULL,
-    firstname character varying(50) NOT NULL,
-    lastname character varying(50) NOT NULL,
-    passwordhash character varying(500) NOT NULL,
+    first_name character varying(50) NOT NULL,
+    last_name character varying(50) NOT NULL,
+    password_hash character varying(500) NOT NULL,
     description character varying(800),
     role character varying(50),
-    createddate timestamp without time zone NOT NULL,
-    modifieddate timestamp without time zone NOT NULL
+    created_date timestamp without time zone NOT NULL,
+    modified_date timestamp without time zone NOT NULL
 );
 
 
 ALTER TABLE public."user" OWNER TO postgres;
+
+ALTER TABLE public."user" ALTER COLUMN id ADD GENERATED ALWAYS AS IDENTITY (
+    SEQUENCE NAME public.user_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1
+);
+
+
+ALTER TABLE ONLY public."user"
+    ADD CONSTRAINT pk_user PRIMARY KEY (id);
+
+ALTER TABLE ONLY public."user"
+    ADD CONSTRAINT uq_user_email UNIQUE (email);
 
 --
 -- Data for Name: map; Type: TABLE DATA; Schema: public; Owner: postgres
@@ -139,6 +158,23 @@ COPY public.robot_command (id, name, description, is_move_command, created_date,
 4	PLACE	Place the robot at X,Y facing direction D	f	2022-07-30 00:00:00	2022-07-30 00:00:00
 5	REPORT	Report the current position of the robot	f	2022-07-30 00:00:00	2022-07-30 00:00:00
 \.
+
+
+--
+-- Data for Name: user; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public."user" (id, email, first_name, last_name, password_hash, description, role, created_date, modified_date) FROM stdin;
+1	admin@deakin.edu.au	Admin	User	AQAAAAIAAYagAAAAEAIcsGUs1W8GPnpnpuR7eBzAFVrE1OiExwfkB4VVlcDAf8oh4Gc7q+ThFCBFrATSpw==	Administrator account	Admin	2022-07-30 00:00:00	2022-07-30 00:00:00
+2	user@deakin.edu.au	Updated	Name	AQAAAAIAAYagAAAAEBSWx5RM/VP1SVXWTSEc4wueJJxptjuE3AhGC3AMgq8dwLLkfJ4HDzvjJnLbcD+WAg==	Updated description	User	2022-07-30 00:00:00	2022-07-30 00:00:00
+\.
+
+
+--
+-- Name: user_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.user_id_seq', 2, true);
 
 
 --

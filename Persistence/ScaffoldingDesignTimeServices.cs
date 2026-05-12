@@ -1,8 +1,8 @@
-using System.Text.RegularExpressions;
 using EntityFrameworkCore.Scaffolding.Handlebars;
-using HandlebarsDotNet;
+using EntityFrameworkCore.Scaffolding.Handlebars.Internal;
 using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace robot_api.Persistence;
 
@@ -15,27 +15,13 @@ public class ScaffoldingDesignTimeServices : IDesignTimeServices
             options.ReverseEngineerOptions = ReverseEngineerOptions.DbContextAndEntities;
         });
 
-        Handlebars.RegisterHelper(
-            "strip-partial",
-            (writer, _, parameters) =>
-            {
-                if (parameters.Length == 0 || parameters[0] is not string text)
-                    return;
-
-                text = Regex.Replace(
-                    text,
-                    @"^[ \t]*OnModelCreatingPartial\(modelBuilder\);[ \t]*\r?\n?",
-                    string.Empty,
-                    RegexOptions.Multiline
-                );
-                text = Regex.Replace(
-                    text,
-                    @"\r?\n[ \t]*partial void OnModelCreatingPartial\(ModelBuilder modelBuilder\);[ \t]*\r?\n?",
-                    string.Empty
-                );
-
-                writer.WriteSafeString(text);
-            }
+        // Replace the package's default DbContext generator with our subclass
+        // so the OnModelCreatingPartial call and declaration are dropped at
+        // generation time (no regex / no post-processing of the rendered file).
+#pragma warning disable EF1001
+        services.Replace(
+            ServiceDescriptor.Singleton<ICSharpDbContextGenerator, NoPartialHbsDbContextGenerator>()
         );
+#pragma warning restore EF1001
     }
 }
